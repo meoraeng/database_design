@@ -1,0 +1,158 @@
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+  }
+
+  h2 {
+    color: #495057;
+  }
+
+  table th, table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  table thead {
+    background-color: #343a40;
+    color: #fff;
+  }
+
+  .btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+  }
+
+  .btn-outline-success:hover {
+    background-color: #28a745;
+    color: #fff;
+  }
+
+  .btn-outline-warning {
+    border-color: #ffc107;
+    color: #ffc107;
+  }
+
+  .btn-outline-warning:hover {
+    background-color: #ffc107;
+    color: #fff;
+  }
+  .input-group .form-select {
+    flex: 0 0 20%; /* 선택지 드롭다운의 너비를 20%로 설정 */
+    max-width: 200px; /* 선택지의 최대 너비 */
+  }
+
+  .input-group .form-control {
+    flex: 1 0 auto; /* 입력창이 나머지 공간을 차지 */
+  }
+
+  .input-group .btn {
+    flex: 0 0 auto; /* 버튼 크기를 고정 */
+  }
+</style>
+
+<div class="container my-4">
+  <!-- Success/Failure Alert Messages -->
+  {{#if successMessage}}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{successMessage}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {{/if}}
+
+  {{#if errorMessage}}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{errorMessage}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {{/if}}
+
+  <form action="/customer/search" method="POST" class="mb-5">
+    <label for="searchType" class="form-label fs-5">검색 옵션을 선택하세요:</label>
+    <div class="input-group">
+      <select id="searchType" name="searchType" class="form-select flex-shrink-1" required>
+        <option value="title">책 제목</option>
+        <option value="award">상 이름</option>
+        <option value="author">작가 이름</option>
+      </select>
+      <input type="text" id="searchQuery" name="searchQuery" class="form-control flex-grow-1" placeholder="검색어를 입력하세요" required>
+      <button type="submit" class="btn btn-primary">검색</button>
+    </div>
+  </form>
+
+  <!-- Book List Table -->
+  {{#if bookList.length}}
+  <table class="table table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">도서번호(ISBN)</th>
+        <th scope="col">제목(Title)</th>
+        <th scope="col">작가(Author)</th>
+        <th scope="col">발행년도(Year)</th>
+        <th scope="col">카테고리(Category)</th>
+        <th scope="col">수상(Award)</th>
+        <th scope="col">가격(Price)</th>
+        <th scope="col">총 수량(Number)</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each bookList}}
+      <tr>
+        <td>{{#if this.ISBN}}{{this.ISBN}}{{else}}-{{/if}}</td>
+        <td>{{#if this.Title}}{{this.Title}}{{else}}-{{/if}}</td>
+        <td>{{#if this.Author}}{{this.Author}}{{else}}-{{/if}}</td>
+        <td>{{#if this.Year}}{{this.Year}}{{else}}-{{/if}}</td>
+        <td>{{#if this.Category}}{{this.Category}}{{else}}-{{/if}}</td>
+        <td>{{#if this.Award}}{{this.Award}}{{else}}-{{/if}}</td>
+        <td>{{#if this.Price}}{{this.Price}}원{{else}}-{{/if}}</td>
+        <td>{{#if this.Number}}{{this.Number}}{{else}}0{{/if}}</td>
+        <td>
+          <!-- 장바구니 담기 폼 -->
+          <form action="/customer/shopping_basket" method="POST" style="display: inline;">
+            <input type="hidden" name="ISBN" value="{{this.ISBN}}">
+            <button type="submit" class="btn btn-sm btn-outline-success">장바구니 담기</button>
+          </form>
+          <!-- 예약하기 버튼 -->
+          <button 
+            class="btn btn-sm btn-outline-warning" 
+            data-bs-toggle="modal" 
+            data-bs-target="#reservationModal-{{this.ISBN}}">
+            예약하기
+          </button>
+        </td>
+      </tr>
+
+      <!-- 예약하기 모달 -->
+      <div class="modal fade" id="reservationModal-{{this.ISBN}}" tabindex="-1" aria-labelledby="reservationModalLabel-{{this.ISBN}}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="reservationModalLabel-{{this.ISBN}}">픽업 시간 선택</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/customer/reservation" method="POST">
+              <div class="modal-body">
+                <!-- Hidden input에 ISBN 값 포함 -->
+                <input type="hidden" name="ISBN" value="{{this.ISBN}}">
+                <p>예약할 책 ISBN: {{this.ISBN}}</p>
+                <div class="mb-3">
+                  <label for="pickupTime-{{this.ISBN}}" class="form-label">픽업 시간</label>
+                  <input type="datetime-local" id="pickupTime-{{this.ISBN}}" name="pickupTime" class="form-control" required>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="submit" class="btn btn-primary">예약하기</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  <p class="text-muted">No books found. Please refine your search.</p>
+  {{/if}}
+</div>

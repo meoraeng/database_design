@@ -1,0 +1,36 @@
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow p-3" style="width: 360px;">
+    <h2 class="text-center mb-2">Welcome to the Bookstore</h2>
+    <p class="text-center text-muted mb-4">사이트 이용을 위해 로그인 해주세요</p>
+    {{#if error}}
+      <div class="alert alert-danger text-center" role="alert">
+        <strong>로그인에 실패했습니다.</strong> 다시 시도해주세요.
+      </div>
+    {{/if}}
+    <form action="/login" method="POST">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="text"
+          id="email"
+          name="email"
+          class="form-control"
+          placeholder="Enter your user ID"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="form-control"
+          placeholder="Enter your password"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+{{! 검색 결과 페이지 }}
+<h2>Search Results</h2>
+{{#if results}}
+  <ul>
+    {{#each results}}
+      <li>
+        <strong>{{this.title}}</strong> by {{this.author}}
+        <button onclick="addToCart('{{this.id}}')">Add to Cart</button>
+        <button onclick="makeReservation('{{this.id}}')">Reserve</button>
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p>No results found.</p>
+{{/if}}
+<script>
+  function addToCart(bookId) {
+    fetch(`/cart/add/${bookId}`, { method: 'POST' }).then(() => alert('Added to cart!'));
+  }
+  function makeReservation(bookId) {
+    const pickupTime = prompt("Enter pickup time (HH:MM):");
+    if (pickupTime) {
+      fetch(`/reservations/add/${bookId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pickupTime })
+      }).then(() => alert('Reservation successful!'));
+    }
+  }
+</script>

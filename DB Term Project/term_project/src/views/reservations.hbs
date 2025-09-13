@@ -1,0 +1,71 @@
+<div class="container my-4">
+  <h2 class="text-center mb-5">{{user.username}}님의 예약현황</h2>
+
+  <!-- 예약 현황 리스트 -->
+  {{#if reservationList.length}}
+  <div class="row gy-4">
+    {{#each reservationList}}
+    <div class="col-12">
+      <div class="card shadow-sm border-info">
+        <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+          <div>
+            <h5 class="card-title mb-3">예약 ID: {{this.ID}}</h5>
+            <p class="mb-1">예약 날짜(Reservation Date): <strong>{{this.Reservation_date}}</strong></p>
+            <p class="mb-1">픽업 날짜(Pickup Time): <strong>{{this.Pickup_time}}</strong></p>
+            <p class="mb-1">책 제목(Title): <strong>{{this.Title}}</strong></p>
+          </div>
+          <div>
+            <!-- 수정 버튼 -->
+            <button 
+              class="btn btn-warning btn-sm" 
+              data-bs-toggle="modal" 
+              data-bs-target="#modifyModal-{{this.ID}}">
+              수정
+            </button>
+            <!-- 취소 버튼 -->
+            <form action="/customer/reservation/cancel" method="POST" style="display: inline;">
+              <input type="hidden" name="reservationID" value="{{this.ID}}">
+              <button type="submit" class="btn btn-danger btn-sm">취소</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 수정 모달 -->
+    <div class="modal fade" id="modifyModal-{{this.ID}}" tabindex="-1" aria-labelledby="modifyModalLabel-{{this.ID}}" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modifyModalLabel-{{this.ID}}">픽업 시간 수정</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="/customer/reservation/modify" method="POST">
+            <div class="modal-body">
+              <!-- Hidden input에 예약 ID 포함 -->
+              <input type="hidden" name="reservationID" value="{{this.ID}}">
+              <div class="mb-3">
+                <label for="pickupTime-{{this.ID}}" class="form-label">새 픽업 시간</label>
+                <input 
+                  type="datetime-local" 
+                  id="pickupTime-{{this.ID}}" 
+                  name="pickupTime" 
+                  class="form-control" 
+                  value="{{this.Pickup_time}}" 
+                  required>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+              <button type="submit" class="btn btn-primary">완료</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{else}}
+  <p class="text-muted text-center">예약된 책이 없습니다.</p>
+  {{/if}}
+</div>

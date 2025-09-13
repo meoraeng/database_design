@@ -1,0 +1,86 @@
+<div class="container my-4">
+  {{#if successMessage}}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{successMessage}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {{/if}}
+
+  {{#if errorMessage}}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{errorMessage}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {{/if}}
+  <h2 class="text-center mb-5">{{user.username}}님의 장바구니</h2>
+
+  <!-- 활성화된 장바구니 -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-primary">장바구니</h3>
+      {{#if activeBasketList.length}}
+      <form action="/customer/shopping_basket/purchase" method="POST">
+        <!-- 모든 BasketID를 hidden input으로 추가 -->
+        {{#each activeBasketList}}
+        <input type="hidden" name="basketID" value="{{this.BasketID}}">
+        {{/each}}
+        <button type="submit" class="btn btn-primary">전체 구매</button>
+      </form>
+      {{/if}}
+    </div>
+
+    {{#if activeBasketList.length}}
+    <div class="row gy-4">
+      {{#each activeBasketList}}
+      <div class="col-12">
+        <div class="card shadow-sm border-primary">
+          <div class="card-body d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+            <div>
+              <h5 class="card-title mb-3">{{this.Title}}</h5>
+              <p class="mb-1">가격(Price): <strong>{{this.Price}}원</strong></p>
+              <p class="mb-1">수량(Number): <strong>{{this.Number}}</strong></p>
+            </div>
+            <div>
+              <!-- 삭제 버튼 -->
+              <form action="/customer/shopping_basket/remove" method="POST" style="display: inline;">
+                <input type="hidden" name="basketID" value="{{this.BasketID}}">
+                <input type="hidden" name="ISBN" value="{{this.ISBN}}">
+                <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{else}}
+    <p class="text-muted text-center">장바구니가 비어 있습니다.</p>
+    {{/if}}
+  </section>
+
+  <!-- 절취선 -->
+  <hr class="border-dashed my-5">
+
+  <!-- 비활성화된 장바구니 (구매내역) -->
+  <section>
+    <h3 class="text-secondary mb-4">구매내역</h3>
+    {{#if inactiveBasketList.length}}
+    <div class="row gy-4">
+      {{#each inactiveBasketList}}
+      <div class="col-12">
+        <div class="card shadow-sm border-secondary">
+          <div class="card-body">
+            <h5 class="card-title mb-3">{{this.Title}}</h5>
+            <p class="mb-1">가격(Price): <strong>{{this.Price}}원</strong></p>
+            <p class="mb-1">수량(Number): <strong>{{this.Number}}</strong></p>
+            <p class="mb-1">구매 날짜(Order Date): <strong>{{this.Order_date}}</strong></p>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{else}}
+    <p class="text-muted text-center">구매내역이 없습니다.</p>
+    {{/if}}
+  </section>
+</div>
